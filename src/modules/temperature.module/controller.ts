@@ -1,13 +1,16 @@
 import { Controller, Get } from '@nestjs/common';
 import { TemperatureService } from './service';
-import { Observable } from 'rxjs';
 
 @Controller('temperature')
 export class TemperatureController {
-  constructor(private readonly temperatureService: TemperatureService) {}
+  public currentTemperature = 0;
+
+  constructor(private readonly temperatureService: TemperatureService) {
+    this.temperatureService.temperature.subscribe((temp) => this.currentTemperature = temp);
+  }
 
   @Get()
-  getTemperature(): Observable<number> {
-    return this.temperatureService.temperature;
+  getTemperature() {
+    return { temperature: this.currentTemperature };
   }
 }

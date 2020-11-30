@@ -1,9 +1,10 @@
 import { Module } from '@nestjs/common';
 import { TemperatureService } from './service';
 import { TemperatureController } from './controller';
+import { ProcessModule } from '../process.module';
 
 @Module({
-  imports: [],
+  imports: [ProcessModule],
   controllers: [TemperatureController],
   providers: [TemperatureService],
 })

@@ -7,9 +7,9 @@ import { HeatingCoolingState } from '../../constants';
 @Injectable()
 export class WebThermostatService {
   public targetHeatingCoolingState: HeatingCoolingState = HeatingCoolingState.Off;
-  public targetTemperature: number = 0;
+  public targetTemperature: number = 150;
   public currentHeatingCoolingState: HeatingCoolingState = HeatingCoolingState.Off;
-  public currentTemperature: number = 0;
+  public currentTemperature: number = 150;
 
   constructor(
     private configService: ConfigService,

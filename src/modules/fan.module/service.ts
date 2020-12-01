@@ -6,8 +6,8 @@ import { OFF, ON, OnOff } from '../../constants';
 
 @Injectable()
 export class FanService {
+  public fanState: OnOff;
   private fan: Gpio;
-  private fanState: OnOff;
 
   constructor() {
     this.fan = new Gpio(GpioPins.FAN, { mode: Gpio.OUTPUT });

@@ -6,6 +6,7 @@ import { ProcessModule } from './modules/process.module';
 import { ConfigModule } from '@nestjs/config';
 import { resolve } from 'path';
 import { WebThermostatModule } from './modules/web-thermostat.module';
+import { FanModule } from './modules/fan.module';
 
 @Module({
   imports: [
@@ -15,7 +16,7 @@ import { WebThermostatModule } from './modules/web-thermostat.module';
     }),
     WebThermostatModule,
     ProcessModule,
-    // FanModule,
+    FanModule,
     TemperatureModule,
   ],
   controllers: [AppController],

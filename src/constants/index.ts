@@ -9,3 +9,13 @@ export function sleep(milliseconds: number): Promise<any> {
     setTimeout(() => resolve(), milliseconds);
   });
 }
+export enum TemperatureDirection {
+  DOWN,
+  UP
+}
+export enum HeatingCoolingState {
+  Off,
+  Heat,
+  Cool,
+  Auto
+}

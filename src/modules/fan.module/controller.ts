@@ -6,7 +6,17 @@ export class FanController {
   constructor(private readonly fanService: FanService) {}
 
   @Get()
-  getHello(): void {
-    // return this.fanService.getHello();
+  getFanStatus(): number {
+    return this.fanService.fanState;
+  }
+
+  @Get('/on')
+  setFanOn() {
+    return this.fanService.setFanOn();
+  }
+
+  @Get('/off')
+  setFanOff() {
+    return this.fanService.setFanOff();
   }
 }

@@ -4,26 +4,19 @@ import { combineLatest, Observable, of, timer } from 'rxjs';
 import { map, mergeMap, share } from 'rxjs/operators';
 import { ProcessService } from '../process.module/service';
 import { ConfigService } from '@nestjs/config';
+import { TemperatureDirection } from '../../constants';
 
-enum TemperatureDirection {
-  DOWN,
-  UP
-}
 
 @Injectable()
 export class TemperatureService {
   public temperature: Observable<number>;
   public previousTemperatures: Observable<number[]>;
-  public directionWeight: Observable<number>;
   public direction: Observable<{ weight: number; direction: TemperatureDirection; }>;
   public averageTemperature: Observable<{ averageTemperature: number; averageTemperaturePrevious: number; previousTemperatures: any[]; }>;
   public averageTemperaturePrevious: Observable<number>;
   private max6675: any;
-  private _previousTemperatures: number[];
-  private temperatureObservable;
   private readTemperatureMessage: any = [{ sendBuffer: Buffer.from([0x01, 0xd0, 0x00]), receiveBuffer: Buffer.alloc(2), byteLength: 2, speedHz: 20000 }];
-  private _averageTemperature: number;
-  private _averageTemperaturePrevious: number;
+
 
   constructor(
     private processService: ProcessService,

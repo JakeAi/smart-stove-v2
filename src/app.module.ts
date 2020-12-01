@@ -1,10 +1,11 @@
-import { Module } from '@nestjs/common';
-import { TemperatureModule } from './modules/temperature.module';
-import { ProcessModule } from './modules/process.module';
-import { ConfigModule } from '@nestjs/config';
-import { resolve } from 'path';
+import { Module }              from '@nestjs/common';
+import { TemperatureModule }   from './modules/temperature.module';
+import { ProcessModule }       from './modules/process.module';
+import { ConfigModule }        from '@nestjs/config';
+import { resolve }             from 'path';
 import { WebThermostatModule } from './modules/web-thermostat.module';
-import { FanModule } from './modules/fan.module';
+import { FanModule }           from './modules/fan.module';
+import { DamperModule }        from './modules/damper.module';
 
 @Module({
   imports: [
@@ -15,6 +16,7 @@ import { FanModule } from './modules/fan.module';
     WebThermostatModule,
     ProcessModule,
     FanModule,
+    DamperModule,
     TemperatureModule,
   ],
   controllers: [],

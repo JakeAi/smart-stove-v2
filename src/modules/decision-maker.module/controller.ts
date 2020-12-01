@@ -12,7 +12,7 @@ export class DecisionMakerController {
 
   @Get()
   getStateStatus() {
-    return this.decisionMakerService.state$.toPromise();
+    return this.decisionMakerState;
   }
 
   @Get( '/on' )

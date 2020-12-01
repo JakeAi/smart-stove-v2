@@ -22,14 +22,15 @@
   },
   "dependencies": {
     "@nestjs/common": "^7.5.1",
+    "@nestjs/config": "^0.6.1",
     "@nestjs/core": "^7.5.1",
     "@nestjs/platform-express": "^7.5.1",
     "max6675-raspi": "0.0.12",
     "pigpio": "^3.0.1",
     "pushover-notifications": "^1.2.1",
     "reflect-metadata": "^0.1.13",
-    "rpi-gpio": "^2.1.5",
     "rimraf": "^3.0.2",
+    "rpi-gpio": "^2.1.5",
     "rxjs": "^6.6.3",
     "spi-device": "^3.0.0"
   },

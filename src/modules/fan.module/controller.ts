@@ -1,7 +1,7 @@
 import { Controller, Get } from '@nestjs/common';
 import { FanService } from './service';
 
-@Controller()
+@Controller('fan')
 export class FanController {
   constructor(private readonly fanService: FanService) {}
 

@@ -1,15 +1,17 @@
 import { Injectable } from '@nestjs/common';
 import { Gpio } from 'pigpio';
 import { GpioPins } from '../../app.service';
-import { OFF, ON } from '../../constants';
+import { OFF, ON, OnOff } from '../../constants';
 
 
 @Injectable()
 export class FanService {
   private fan: Gpio;
+  private fanState: OnOff;
 
   constructor() {
     this.fan = new Gpio(GpioPins.FAN, { mode: Gpio.OUTPUT });
+    this.fanState = this.fan.digitalRead();
   }
 
   public setFanState(state: 0 | 1) { this.fan.digitalWrite(state); }

@@ -7,5 +7,6 @@ import { TemperatureModule }       from '../temperature.module';
   imports: [TemperatureModule],
   controllers: [WebThermostatController],
   providers: [WebThermostatService],
+  exports: [WebThermostatService],
 })
 export class WebThermostatModule {}

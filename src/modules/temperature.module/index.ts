@@ -7,6 +7,7 @@ import { ProcessModule } from '../process.module';
   imports: [ProcessModule],
   controllers: [TemperatureController],
   providers: [TemperatureService],
+  exports: [TemperatureService],
 })
 export class TemperatureModule {
 

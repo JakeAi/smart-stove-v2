@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-// import { openSync, SpiDevice, SpiMessage } from 'spi-device';
+import { openSync, SpiDevice, SpiMessage } from 'spi-device';
 import { combineLatest, Observable, of, timer } from 'rxjs';
 import { map, mergeMap, share } from 'rxjs/operators';
 import { ProcessService } from '../process.module/service';
@@ -10,12 +10,11 @@ import { TemperatureDirection } from '../../constants';
 @Injectable()
 export class TemperatureService {
   public temperature: Observable<number>;
-  public previousTemperatures: Observable<number[]>;
   public direction: Observable<{ weight: number; direction: TemperatureDirection; }>;
   public averageTemperature: Observable<{ averageTemperature: number; averageTemperaturePrevious: number; previousTemperatures: any[]; }>;
-  public averageTemperaturePrevious: Observable<number>;
-  private max6675: any;
-  private readTemperatureMessage: any = [{ sendBuffer: Buffer.from([0x01, 0xd0, 0x00]), receiveBuffer: Buffer.alloc(2), byteLength: 2, speedHz: 20000 }];
+
+  private max6675: SpiDevice;
+  private readTemperatureMessage: SpiMessage = [{ sendBuffer: Buffer.from([0x01, 0xd0, 0x00]), receiveBuffer: Buffer.alloc(2), byteLength: 2, speedHz: 20000 }];
 
 
   constructor(
@@ -30,7 +29,7 @@ export class TemperatureService {
       });
     }));
 
-    // this.max6675 = openSync(0, 0);
+    this.max6675 = openSync(0, 0);
 
     this.temperature = timer(1, 15000)
       .pipe(
@@ -41,7 +40,6 @@ export class TemperatureService {
 
     this.averageTemperature = of({ averageTemperature: 0, averageTemperaturePrevious: 0, previousTemperatures: [] })
       .pipe(
-        share(),
         mergeMap((data) => combineLatest([of(data), this.temperature])),
         map(([obj, temperature]) => {
           obj.averageTemperaturePrevious = obj.averageTemperature;
@@ -67,12 +65,6 @@ export class TemperatureService {
       }),
       share(),
     );
-    // @ts-ignore
-
-
-    this.temperature.subscribe(temperature => console.log({ temperature }));
-    this.averageTemperature.subscribe(averageTemperature => console.log({ averageTemperature }));
-    this.direction.subscribe(direction => console.log({ direction }));
 
 
   }
@@ -80,23 +72,18 @@ export class TemperatureService {
   private readTemperature(): Observable<number> {
     return new Observable<number>((observer) => {
       try {
-        if (Boolean(this.configService.get<boolean>('development'))) {
-          observer.next(Math.floor(Math.random() * (200 - 300 + 1) + 200));
-          observer.complete();
-        } else {
-          this.max6675.transfer(this.readTemperatureMessage, (err: Error | null | undefined, message) => {
-            if (err) { throw err; }
-            if (message[0].receiveBuffer.length !== 2) { throw new Error('not enough data'); }
+        this.max6675.transfer(this.readTemperatureMessage, (err: Error | null | undefined, message) => {
+          if (err) { throw err; }
+          if (message[0].receiveBuffer.length !== 2) { throw new Error('not enough data'); }
 
-            let word = (message[0].receiveBuffer[0] << 8) | message[0].receiveBuffer[1];
-            if ((word & 0x8006) === 0) {
-              let t: number = ((word >>> 0) >> 3) / 4.0;
-              let f: number = t * (9 / 5) + 32.0;
-              observer.next(Math.floor(f));
-              observer.complete();
-            }
-          });
-        }
+          let word = (message[0].receiveBuffer[0] << 8) | message[0].receiveBuffer[1];
+          if ((word & 0x8006) === 0) {
+            let t: number = ((word >>> 0) >> 3) / 4.0;
+            let f: number = t * (9 / 5) + 32.0;
+            observer.next(Math.floor(f));
+            observer.complete();
+          }
+        });
       } catch (e) {
         observer.error(e);
       }

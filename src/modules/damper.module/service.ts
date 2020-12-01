@@ -1,7 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { Gpio } from 'pigpio';
-import { GpioPins } from '../../app.service';
-import { OFF, ON, sleep } from '../../constants';
+import { GpioPins, OFF, ON, sleep } from '../../constants';
 import { ConfigService } from '@nestjs/config';
 
 
@@ -10,7 +9,7 @@ export class DamperService {
   private actuatorOpen: Gpio;
   private actuatorClose: Gpio;
   private actuatorTravelTime: number;
-  private actuatorPosition: number;
+  public actuatorPosition: number;
 
   constructor(private readonly config: ConfigService) {
     this.actuatorTravelTime = config.get('actuatorTravelTime', 7);

@@ -6,8 +6,8 @@ export class FanController {
   constructor(private readonly fanService: FanService) {}
 
   @Get()
-  getFanStatus(): number {
-    return this.fanService.fanState;
+  getFanStatus() {
+    return this.fanService.state$.asObservable();
   }
 
   @Get('/on')

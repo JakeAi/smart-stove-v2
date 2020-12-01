@@ -1,6 +1,4 @@
 import { Module } from '@nestjs/common';
-import { AppController } from './app.controller';
-import { AppService } from './app.service';
 import { TemperatureModule } from './modules/temperature.module';
 import { ProcessModule } from './modules/process.module';
 import { ConfigModule } from '@nestjs/config';
@@ -19,8 +17,8 @@ import { FanModule } from './modules/fan.module';
     FanModule,
     TemperatureModule,
   ],
-  controllers: [AppController],
-  providers: [AppService],
-  exports: [AppService],
+  controllers: [],
+  providers: [],
+  exports: [],
 })
 export class AppModule {}

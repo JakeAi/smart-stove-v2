@@ -1,22 +1,23 @@
 import { Controller, Get } from '@nestjs/common';
 import { DecisionMakerService } from './service';
+import { OFF, ON } from '../../constants';
 
 @Controller('decision-maker')
 export class DecisionMakerController {
   constructor(private readonly decisionMakerService: DecisionMakerService) {}
 
   @Get()
-  getFanStatus(): number {
-    return this.decisionMakerService.state;
+  getStateStatus() {
+    return this.decisionMakerService.state$.asObservable();
   }
 
   @Get('/on')
-  setFanOn() {
-    return this.decisionMakerService.setFanOn();
+  setStateOn() {
+    return this.decisionMakerService.setState(ON);
   }
 
   @Get('/off')
-  setFanOff() {
-    return this.decisionMakerService.setFanOff();
+  setStateOff() {
+    return this.decisionMakerService.setState(OFF);
   }
 }

@@ -1,7 +1,7 @@
 import { Controller, Get }      from '@nestjs/common';
 import { DecisionMakerService } from './service';
-import { OFF, ON }              from '../../constants';
-import { take }                 from 'rxjs/operators';
+import { OFF, ON }    from '../../constants';
+import { last, take } from 'rxjs/operators';
 
 @Controller('decision-maker')
 export class DecisionMakerController {
@@ -9,7 +9,7 @@ export class DecisionMakerController {
 
   @Get()
   getStateStatus() {
-    return this.decisionMakerService.state$.pipe(take(1));
+    return this.decisionMakerService.state$.toPromise();
   }
 
   @Get('/on')

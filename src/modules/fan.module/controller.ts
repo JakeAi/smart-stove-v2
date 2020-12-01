@@ -3,20 +3,24 @@ import { FanService } from './service';
 
 @Controller('fan')
 export class FanController {
-  constructor(private readonly fanService: FanService) {}
+	private fanState;
 
-  @Get()
-  getFanStatus() {
-    return this.fanService.state$.asObservable();
-  }
+	constructor(private readonly fanService: FanService) {
+		this.fanService.state$.subscribe(state => this.fanState = state);
+	}
 
-  @Get('/on')
-  setFanOn() {
-    return this.fanService.setFanOn();
-  }
+	@Get()
+	getFanStatus() {
+		return this.fanState;
+	}
 
-  @Get('/off')
-  setFanOff() {
-    return this.fanService.setFanOff();
-  }
+	@Get('/on')
+	setFanOn() {
+		return this.fanService.setFanOn();
+	}
+
+	@Get('/off')
+	setFanOff() {
+		return this.fanService.setFanOff();
+	}
 }

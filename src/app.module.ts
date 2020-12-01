@@ -21,4 +21,6 @@ import { FanModule } from './modules/fan.module';
   providers: [],
   exports: [],
 })
-export class AppModule {}
+export class AppModule {
+  constructor(){}
+}

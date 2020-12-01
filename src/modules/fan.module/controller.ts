@@ -1,9 +1,10 @@
 import { Controller, Get } from '@nestjs/common';
+import { OnOff } from '../../constants';
 import { FanService } from './service';
 
 @Controller('fan')
 export class FanController {
-	private fanState;
+	private fanState: OnOff = OnOff.Off;
 
 	constructor(private readonly fanService: FanService) {
 		this.fanService.state$.subscribe(state => this.fanState = state);

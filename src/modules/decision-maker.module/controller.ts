@@ -1,24 +1,27 @@
 import { Controller, Get }      from '@nestjs/common';
 import { DecisionMakerService } from './service';
-import { OFF, ON }    from '../../constants';
-import { last, take } from 'rxjs/operators';
+import { OFF, ON, OnOff }       from '../../constants';
 
-@Controller('decision-maker')
+@Controller( 'decision-maker' )
 export class DecisionMakerController {
-  constructor(private readonly decisionMakerService: DecisionMakerService) {}
+  private decisionMakerState: OnOff = OnOff.Off;
+
+  constructor( private readonly decisionMakerService: DecisionMakerService ) {
+    this.decisionMakerService.state$.subscribe( state => this.decisionMakerState = state );
+  }
 
   @Get()
   getStateStatus() {
     return this.decisionMakerService.state$.toPromise();
   }
 
-  @Get('/on')
+  @Get( '/on' )
   setStateOn() {
-    return this.decisionMakerService.setState(ON);
+    return this.decisionMakerService.setState( ON );
   }
 
-  @Get('/off')
+  @Get( '/off' )
   setStateOff() {
-    return this.decisionMakerService.setState(OFF);
+    return this.decisionMakerService.setState( OFF );
   }
 }

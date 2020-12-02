@@ -4,8 +4,8 @@ import { HeatingCoolingState, TemperatureDirection } from '../../constants';
 import { DamperService } from '../damper.module/service';
 import { FanService } from '../fan.module/service';
 import { TemperatureService } from '../temperature.module/service';
-import { BehaviorSubject } from 'rxjs';
-import { filter, mergeMap, tap } from 'rxjs/operators';
+import { BehaviorSubject, combineLatest } from 'rxjs';
+import { filter } from 'rxjs/operators';
 
 
 @Injectable()
@@ -26,15 +26,16 @@ export class WebThermostatService {
   ) {
     this.fanService.state$.subscribe();
 
-    this.targetHeatingCoolingState$
+    combineLatest([
+      this.targetHeatingCoolingState$,
+      this.temperatureService.temperature$,
+    ])
       .pipe(
-        tap(state => console.log(state)),
-        filter(state => state === HeatingCoolingState.Heat),
-        tap(state => console.log(state)),
-        mergeMap(() => this.temperatureService.temperature$),
+        filter(([state, temp]) => state === HeatingCoolingState.Heat),
       )
-      .subscribe(async (temp) => {
-        console.log('HEAT', temp);
+      .subscribe(async ([state, temp]) => {
+
+        console.log('HEAT', temp, state);
 
         let { temperatureCurrent, direction } = temp;
         let actuatorPosition = this.damperService.actuatorPosition;
@@ -50,6 +51,7 @@ export class WebThermostatService {
           if (direction === TemperatureDirection.DOWN) { await this.damperService.setDamperPosition(actuatorPosition + 5); }
           if (direction === TemperatureDirection.UP) { await this.damperService.setDamperPosition(actuatorPosition - 10); }
         }
+
 
       });
   }

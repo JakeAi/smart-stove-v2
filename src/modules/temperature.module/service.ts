@@ -73,7 +73,7 @@ export class TemperatureService {
         }
         if (temperature$.directionWeight < 0) { temperature$.direction = TemperatureDirection.DOWN; }
         if (temperature$.directionWeight > 0) { temperature$.direction = TemperatureDirection.UP; }
-
+        console.log(this._temperature$);
         this.temperature$.next(temperature$);
       });
 

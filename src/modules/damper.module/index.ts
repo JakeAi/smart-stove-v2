@@ -6,5 +6,6 @@ import { DamperController } from './controller';
   imports: [],
   controllers: [DamperController],
   providers: [DamperService],
+  exports: [DamperService],
 })
 export class DamperModule {}

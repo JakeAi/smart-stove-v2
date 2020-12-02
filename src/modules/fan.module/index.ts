@@ -6,6 +6,7 @@ import { FanController } from './controller';
   imports: [],
   controllers: [FanController],
   providers: [FanService],
+  exports: [FanService],
 })
 export class FanModule {
 

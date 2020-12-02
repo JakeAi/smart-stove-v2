@@ -37,7 +37,7 @@ export class WebThermostatController {
   targetTemperature(@Query('value') targetTemperature: string) {
     let temp = Math.floor(parseFloat(targetTemperature));
     let temperatureF = temp * (9 / 5) + 32.0;
-    this.service.targetHeatingCoolingState = temperatureF;
+    this.service.setTargetTemperature(temperatureF);
     console.log({ temperatureF });
   }
 

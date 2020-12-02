@@ -7,7 +7,7 @@ import { BehaviorSubject } from 'rxjs';
 
 @Injectable()
 export class DamperService {
-  public actuatorPosition: number = 0;
+  public actuatorPosition: number = 100;
   public actuatorPosition$: BehaviorSubject<number> = new BehaviorSubject<number>(0);
 
   private actuatorOpen: Gpio;

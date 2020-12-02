@@ -42,4 +42,8 @@ export class WebThermostatService {
     this.targetHeatingCoolingState$.next(state);
   }
 
+  public setTargetTemperature(temp: number) {
+    this.targetTemperature = temp;
+  }
+
 }

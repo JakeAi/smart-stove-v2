@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import { HeatingCoolingState } from '../../constants';
+import { HeatingCoolingState, TemperatureDirection } from '../../constants';
 import { DamperService } from '../damper.module/service';
 import { FanService } from '../fan.module/service';
 import { TemperatureService } from '../temperature.module/service';
@@ -31,8 +31,24 @@ export class WebThermostatService {
         filter(state => state === HeatingCoolingState.Heat),
         mergeMap(() => this.temperatureService.temperature$),
       )
-      .subscribe((temp) => {
+      .subscribe(async (temp) => {
         console.log('HEAT', temp);
+
+        let { temperatureCurrent, direction } = temp;
+        let actuatorPosition = this.damperService.actuatorPosition;
+
+        if (temperatureCurrent < 100) { return await this.damperService.setDamperPosition(1); }
+
+        if (temperatureCurrent < this.targetTemperature) {
+          if (direction === TemperatureDirection.DOWN) { await this.damperService.setDamperPosition(actuatorPosition + 10); }
+          if (direction === TemperatureDirection.UP) { await this.damperService.setDamperPosition(actuatorPosition + 5); }
+        }
+
+        if (temperatureCurrent > this.targetTemperature) {
+          if (direction === TemperatureDirection.DOWN) { await this.damperService.setDamperPosition(actuatorPosition + 5); }
+          if (direction === TemperatureDirection.UP) { await this.damperService.setDamperPosition(actuatorPosition - 10); }
+        }
+
       });
   }
 
@@ -44,6 +60,10 @@ export class WebThermostatService {
 
   public setTargetTemperature(temp: number) {
     this.targetTemperature = temp;
+  }
+
+  private isRange(temp, low, high) {
+    return temp > low && temp <= high;
   }
 
 }

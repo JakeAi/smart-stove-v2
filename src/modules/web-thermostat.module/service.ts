@@ -31,8 +31,8 @@ export class WebThermostatService {
 
     this.targetHeatingCoolingState$.pipe(
       filter(state => state === HeatingCoolingState.Heat),
-      mergeMap(() =>combineLatest([this.temperatureService.temperature,this.temperatureService.averageTemperature,this.temperatureService.direction]) ),
-      skip(3)
+      mergeMap(() => combineLatest([this.temperatureService.temperature, this.temperatureService.averageTemperature, this.temperatureService.direction])),
+      skip(3),
     ).subscribe((temp) => {
 
       console.log('HEAT', temp);
@@ -40,6 +40,8 @@ export class WebThermostatService {
   }
 
   public setTargetHeatingCoolingState(state: HeatingCoolingState) {
+    this.targetHeatingCoolingState = state;
+    this.currentHeatingCoolingState = state;
     this.targetHeatingCoolingState$.next(state);
   }
 

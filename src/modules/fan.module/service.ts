@@ -1,12 +1,12 @@
 import { Injectable } from '@nestjs/common';
 import { Gpio } from 'pigpio';
 import { GpioPins, OFF, ON, OnOff } from '../../constants';
-import { Subject } from 'rxjs';
+import { BehaviorSubject } from 'rxjs';
 
 
 @Injectable()
 export class FanService {
-  public state$: Subject<OnOff> = new Subject<OnOff>();
+  public state$: BehaviorSubject<OnOff> = new BehaviorSubject<OnOff>(OnOff.Off);
   private fan: Gpio;
 
   constructor() {

@@ -1,7 +1,7 @@
-import { Module }                  from '@nestjs/common';
+import { Module } from '@nestjs/common';
 import { WebThermostatController } from './controller';
-import { WebThermostatService }    from './service';
-import { TemperatureModule }       from '../temperature.module';
+import { WebThermostatService } from './service';
+import { TemperatureModule } from '../temperature.module';
 
 @Module({
   imports: [TemperatureModule],

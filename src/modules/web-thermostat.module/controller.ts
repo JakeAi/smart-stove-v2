@@ -22,7 +22,7 @@ export class WebThermostatController {
       targetHeatingCoolingState: this.service.targetHeatingCoolingState,
       currentHeatingCoolingState: this.service.currentHeatingCoolingState,
       targetTemperature: this.service.targetTemperature,
-      currentTemperature: this.temperature.temperatureCurrent,
+      currentTemperature: (this.temperature.temperatureCurrent - 32) * 5 / 9,
     };
   }
 

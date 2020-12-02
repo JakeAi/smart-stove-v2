@@ -40,7 +40,7 @@ export class WebThermostatService {
         let { temperatureCurrent, direction } = temp;
         let actuatorPosition = this.damperService.actuatorPosition;
 
-        if (temperatureCurrent < 100) { return await this.damperService.setDamperPosition(1); }
+        if (temperatureCurrent < 50) { return await this.damperService.setDamperPosition(1); }
 
         if (temperatureCurrent < this.targetTemperature) {
           if (direction === TemperatureDirection.DOWN) { await this.damperService.setDamperPosition(actuatorPosition + 10); }

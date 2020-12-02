@@ -63,9 +63,4 @@ export class WebThermostatService {
   public setTargetTemperature(temp: number) {
     this.targetTemperature = temp;
   }
-
-  private isRange(temp, low, high) {
-    return temp > low && temp <= high;
-  }
-
 }

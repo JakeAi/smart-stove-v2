@@ -16,10 +16,6 @@ export class DamperController {
     return this.damperService.actuatorPosition > 0 ? ON : OFF;
   }
 
-  @Get('/position/:position')
-  setDamperPosition(@Param('position', ParseIntPipe) position: number): Promise<void> {
-    return this.damperService.setDamperPosition(position);
-  }
 
   @Get('/state/on')
   setDamperOn(): Promise<void> {
@@ -29,5 +25,10 @@ export class DamperController {
   @Get('/state/off')
   setDamperOff(): Promise<void> {
     return this.damperService.closeDamper();
+  }
+
+  @Get('/position/:position')
+  setDamperPosition(@Param('position', ParseIntPipe) position: number): Promise<void> {
+    return this.damperService.setDamperPosition(position);
   }
 }

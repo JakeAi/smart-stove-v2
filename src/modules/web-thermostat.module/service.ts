@@ -5,7 +5,7 @@ import { DamperService } from '../damper.module/service';
 import { FanService } from '../fan.module/service';
 import { TemperatureService } from '../temperature.module/service';
 import { BehaviorSubject } from 'rxjs';
-import { filter, mergeMap } from 'rxjs/operators';
+import { filter, mergeMap, tap } from 'rxjs/operators';
 
 
 @Injectable()
@@ -28,7 +28,9 @@ export class WebThermostatService {
 
     this.targetHeatingCoolingState$
       .pipe(
+        tap(state => console.log(state)),
         filter(state => state === HeatingCoolingState.Heat),
+        tap(state => console.log(state)),
         mergeMap(() => this.temperatureService.temperature$),
       )
       .subscribe(async (temp) => {

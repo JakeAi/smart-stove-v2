@@ -7,8 +7,8 @@ export class DamperController {
   constructor(private readonly damperService: DamperService) {}
 
   @Get('/position')
-  getDamperPosition(): number {
-    return this.damperService.actuatorPosition;
+  getDamperPosition() {
+    return { position: this.damperService.actuatorPosition };
   }
 
   @Get('/position/status')

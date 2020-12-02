@@ -35,10 +35,8 @@ export class WebThermostatService {
       )
       .subscribe(async ([state, temp]) => {
 
-        console.log('HEAT', temp, state);
-
         let { temperatureCurrent, direction } = temp;
-        let actuatorPosition = this.damperService.actuatorPosition;
+        let { actuatorPosition } = this.damperService;
 
         if (temperatureCurrent < 50) { return await this.damperService.setDamperPosition(0); }
 

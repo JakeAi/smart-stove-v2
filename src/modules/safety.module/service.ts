@@ -21,7 +21,6 @@ export class SafetyService {
         if (temp.temperatureCurrent >= 550) {
           this.fanService.setFanOn();
         }
-        console.log('HEAT', temp);
       });
   }
 

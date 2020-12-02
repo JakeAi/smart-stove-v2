@@ -30,7 +30,6 @@ export class WebThermostatController {
   targetHeatingCoolingState(@Query('value') targetHeatingCoolingState: string) {
     let targetState: HeatingCoolingState = parseInt(targetHeatingCoolingState);
     this.service.setTargetHeatingCoolingState(targetState);
-    console.log({ targetState });
   }
 
   @Get('/targetTemperature')
@@ -38,7 +37,6 @@ export class WebThermostatController {
     let temp = Math.floor(parseFloat(targetTemperature));
     let temperatureF = temp * (9 / 5) + 32.0;
     this.service.setTargetTemperature(temperatureF);
-    console.log({ temperatureF });
   }
 
 }

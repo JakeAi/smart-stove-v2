@@ -11,7 +11,7 @@ import { filter } from 'rxjs/operators';
 @Injectable()
 export class WebThermostatService {
   public targetHeatingCoolingState: HeatingCoolingState = HeatingCoolingState.Off;
-  public targetTemperature: number = 150;
+  public targetTemperature: number = 350;
   public currentHeatingCoolingState: HeatingCoolingState = HeatingCoolingState.Off;
   public currentTemperature: number = 150;
 

@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { openSync, SpiDevice, SpiMessage } from 'spi-device';
-import { BehaviorSubject, Observable, timer } from 'rxjs';
+import { Observable, of, Subject, timer } from 'rxjs';
 import { map, mergeMap } from 'rxjs/operators';
 import { ProcessService } from '../process.module/service';
 import { ConfigService } from '@nestjs/config';
@@ -18,7 +18,9 @@ export interface Temperature {
 
 @Injectable()
 export class TemperatureService {
-  public temperature$: BehaviorSubject<Temperature> = new BehaviorSubject<Temperature>({
+  public temperature$: Subject<Temperature> = new Subject<Temperature>();
+
+  private _temperature$: Temperature = {
     temperatureCurrent: 0,
     temperaturePrevious: 0,
     temperatureAverageCurrent: 0,
@@ -26,7 +28,7 @@ export class TemperatureService {
     previousTemperatures: [],
     directionWeight: 0,
     direction: TemperatureDirection.DOWN,
-  });
+  };
 
   private max6675: SpiDevice;
   private readTemperatureMessage: SpiMessage = [{ sendBuffer: Buffer.from([0x01, 0xd0, 0x00]), receiveBuffer: Buffer.alloc(2), byteLength: 2, speedHz: 20000 }];
@@ -49,7 +51,7 @@ export class TemperatureService {
     timer(1, 15000)
       .pipe(
         mergeMap(() => this.readTemperature()),
-        mergeMap((temperature) => this.temperature$
+        mergeMap((temperature) => of(this._temperature$)
           .pipe(
             map((temperature$) => ({ temperature, temperature$ })),
           )),

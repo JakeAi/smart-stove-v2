@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { openSync, SpiDevice, SpiMessage } from 'spi-device';
-import { BehaviorSubject, combineLatest, Observable, timer } from 'rxjs';
-import { mergeMap } from 'rxjs/operators';
+import { BehaviorSubject, Observable, timer } from 'rxjs';
+import { map, mergeMap } from 'rxjs/operators';
 import { ProcessService } from '../process.module/service';
 import { ConfigService } from '@nestjs/config';
 import { TemperatureDirection } from '../../constants';
@@ -48,27 +48,31 @@ export class TemperatureService {
 
     timer(1, 15000)
       .pipe(
-        mergeMap(() => combineLatest([this.readTemperature(), this.temperature$])),
+        mergeMap(() => this.readTemperature()),
+        mergeMap((temperature) => this.temperature$
+          .pipe(
+            map((temperature$) => ({ temperature, temperature$ })),
+          )),
       )
-      .subscribe(([temp, obj]) => {
-        obj.temperatureAveragePrevious = obj.temperatureAverageCurrent;
-        obj.temperaturePrevious = obj.temperatureCurrent;
-        obj.temperatureCurrent = temp;
+      .subscribe(({ temperature, temperature$ }) => {
+        temperature$.temperatureAveragePrevious = temperature$.temperatureAverageCurrent;
+        temperature$.temperaturePrevious = temperature$.temperatureCurrent;
+        temperature$.temperatureCurrent = temperature;
 
-        obj.previousTemperatures.push(temp);
-        if (obj.previousTemperatures.length > 10) {obj.previousTemperatures.shift();}
+        temperature$.previousTemperatures.push(temperature);
+        if (temperature$.previousTemperatures.length > 10) {temperature$.previousTemperatures.shift();}
 
-        obj.temperatureAverageCurrent = Math.floor(obj.previousTemperatures.reduce((prev, curr) => prev + curr) / obj.previousTemperatures.length);
+        temperature$.temperatureAverageCurrent = Math.floor(temperature$.previousTemperatures.reduce((prev, curr) => prev + curr) / temperature$.previousTemperatures.length);
 
-        if (obj.temperatureAverageCurrent - obj.temperatureAveragePrevious < 0) {
-          if (obj.directionWeight > -5) { obj.directionWeight -= 1; }
+        if (temperature$.temperatureAverageCurrent - temperature$.temperatureAveragePrevious < 0) {
+          if (temperature$.directionWeight > -5) { temperature$.directionWeight -= 1; }
         } else {
-          if (obj.directionWeight < 5) { obj.directionWeight += 1; }
+          if (temperature$.directionWeight < 5) { temperature$.directionWeight += 1; }
         }
-        if (obj.directionWeight < 0) { obj.direction = TemperatureDirection.DOWN; }
-        if (obj.directionWeight > 0) { obj.direction = TemperatureDirection.UP; }
+        if (temperature$.directionWeight < 0) { temperature$.direction = TemperatureDirection.DOWN; }
+        if (temperature$.directionWeight > 0) { temperature$.direction = TemperatureDirection.UP; }
 
-        this.temperature$.next(obj);
+        this.temperature$.next(temperature$);
       });
 
 

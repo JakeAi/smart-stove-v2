@@ -1,18 +1,19 @@
 import { Controller, Get, Query } from '@nestjs/common';
 import { HeatingCoolingState } from '../../constants';
 import { WebThermostatService } from './service';
-import { TemperatureService } from '../temperature.module/service';
+import { Temperature, TemperatureService } from '../temperature.module/service';
 
 
 @Controller('web-thermostat')
 export class WebThermostatController {
+  public temperature: Temperature;
   public currentTemperature = 0;
 
   constructor(
     private service: WebThermostatService,
     private temperatureService: TemperatureService,
   ) {
-    this.temperatureService.temperature.subscribe(temp => this.currentTemperature = temp);
+    this.temperatureService.temperature$.subscribe(temp => this.temperature = temp);
   }
 
   @Get('status')

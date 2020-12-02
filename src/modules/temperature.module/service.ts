@@ -1,17 +1,32 @@
 import { Injectable } from '@nestjs/common';
 import { openSync, SpiDevice, SpiMessage } from 'spi-device';
-import { combineLatest, Observable, of, timer } from 'rxjs';
-import { map, mergeMap, share } from 'rxjs/operators';
+import { BehaviorSubject, combineLatest, Observable, timer } from 'rxjs';
+import { mergeMap } from 'rxjs/operators';
 import { ProcessService } from '../process.module/service';
 import { ConfigService } from '@nestjs/config';
 import { TemperatureDirection } from '../../constants';
 
+export interface Temperature {
+  temperatureCurrent: number,
+  temperaturePrevious: number,
+  temperatureAverageCurrent: number,
+  temperatureAveragePrevious: number,
+  previousTemperatures: number[],
+  directionWeight: number,
+  direction: TemperatureDirection,
+}
 
 @Injectable()
 export class TemperatureService {
-  public temperature: Observable<number>;
-  public direction: Observable<{ weight: number; direction: TemperatureDirection; }>;
-  public averageTemperature: Observable<{ averageTemperature: number; averageTemperaturePrevious: number; previousTemperatures: any[]; }>;
+  public temperature$: BehaviorSubject<Temperature> = new BehaviorSubject<Temperature>({
+    temperatureCurrent: 0,
+    temperaturePrevious: 0,
+    temperatureAverageCurrent: 0,
+    temperatureAveragePrevious: 0,
+    previousTemperatures: [],
+    directionWeight: 0,
+    direction: TemperatureDirection.DOWN,
+  });
 
   private max6675: SpiDevice;
   private readTemperatureMessage: SpiMessage = [{ sendBuffer: Buffer.from([0x01, 0xd0, 0x00]), receiveBuffer: Buffer.alloc(2), byteLength: 2, speedHz: 20000 }];
@@ -31,40 +46,30 @@ export class TemperatureService {
 
     this.max6675 = openSync(0, 0);
 
-    this.temperature = timer(1, 15000)
+    timer(1, 15000)
       .pipe(
-        mergeMap(() => this.readTemperature()),
-        share(),
-      );
+        mergeMap(() => combineLatest([this.readTemperature(), this.temperature$])),
+      )
+      .subscribe(([temp, obj]) => {
+        obj.temperatureAveragePrevious = obj.temperatureAverageCurrent;
+        obj.temperaturePrevious = obj.temperatureCurrent;
+        obj.temperatureCurrent = temp;
 
+        obj.previousTemperatures.push(temp);
+        if (obj.previousTemperatures.length > 10) {obj.previousTemperatures.shift();}
 
-    this.averageTemperature = of({ averageTemperature: 0, averageTemperaturePrevious: 0, previousTemperatures: [] })
-      .pipe(
-        mergeMap((data) => combineLatest([of(data), this.temperature])),
-        map(([obj, temperature]) => {
-          obj.averageTemperaturePrevious = obj.averageTemperature;
-          obj.previousTemperatures.push(temperature);
-          if (obj.previousTemperatures.length > 10) {obj.previousTemperatures.shift();}
-          obj.averageTemperature = Math.floor(obj.previousTemperatures.reduce((prev, curr) => prev + curr) / obj.previousTemperatures.length);
-          return obj;
-        }),
-        share(),
-      );
+        obj.temperatureAverageCurrent = Math.floor(obj.previousTemperatures.reduce((prev, curr) => prev + curr) / obj.previousTemperatures.length);
 
-    this.direction = of({ weight: 0, direction: TemperatureDirection.DOWN }).pipe(
-      mergeMap((data) => combineLatest([of(data), this.averageTemperature])),
-      map(([weight, averageTemperature]) => {
-        if (averageTemperature.averageTemperature - averageTemperature.averageTemperaturePrevious < 0) {
-          if (weight.weight > -5) { weight.weight -= 1; }
+        if (obj.temperatureAverageCurrent - obj.temperatureAveragePrevious < 0) {
+          if (obj.directionWeight > -5) { obj.directionWeight -= 1; }
         } else {
-          if (weight.weight < 5) { weight.weight += 1; }
+          if (obj.directionWeight < 5) { obj.directionWeight += 1; }
         }
-        if (weight.weight < 0) { weight.direction = TemperatureDirection.DOWN; }
-        if (weight.weight > 0) { weight.direction = TemperatureDirection.UP; }
-        return weight;
-      }),
-      share(),
-    );
+        if (obj.directionWeight < 0) { obj.direction = TemperatureDirection.DOWN; }
+        if (obj.directionWeight > 0) { obj.direction = TemperatureDirection.UP; }
+
+        this.temperature$.next(obj);
+      });
 
 
   }

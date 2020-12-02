@@ -5,7 +5,7 @@ import { DamperService } from '../damper.module/service';
 import { FanService } from '../fan.module/service';
 import { TemperatureService } from '../temperature.module/service';
 import { BehaviorSubject, combineLatest } from 'rxjs';
-import { filter, mergeMap } from 'rxjs/operators';
+import { filter, mergeMap, skip } from 'rxjs/operators';
 
 
 @Injectable()
@@ -32,6 +32,7 @@ export class WebThermostatService {
     this.targetHeatingCoolingState$.pipe(
       filter(state => state === HeatingCoolingState.Heat),
       mergeMap(() =>combineLatest([this.temperatureService.temperature,this.temperatureService.averageTemperature,this.temperatureService.direction]) ),
+      skip(3)
     ).subscribe((temp) => {
 
       console.log('HEAT', temp);

@@ -2,11 +2,14 @@ import { Injectable } from '@nestjs/common';
 import { Gpio } from 'pigpio';
 import { GpioPins, OFF, ON, sleep } from '../../constants';
 import { ConfigService } from '@nestjs/config';
+import { BehaviorSubject } from 'rxjs';
 
 
 @Injectable()
 export class DamperService {
   public actuatorPosition: number = 0;
+  public actuatorPosition$: BehaviorSubject<number> = new BehaviorSubject<number>(0);
+
   private actuatorOpen: Gpio;
   private actuatorClose: Gpio;
   private actuatorTravelTime: number;
@@ -34,20 +37,25 @@ export class DamperService {
       await sleep(secondsOfTravel);
       this.actuatorOpen.digitalWrite(OFF);
     }
-    this.actuatorPosition = position;
+    this.next(position);
   }
 
   public async closeDamper() {
     this.actuatorClose.digitalWrite(ON);
     await sleep(this.actuatorTravelTime * 1000);
     this.actuatorClose.digitalWrite(OFF);
-    this.actuatorPosition = 0;
+    this.next(0);
   }
 
   public async openDamper() {
     this.actuatorOpen.digitalWrite(ON);
     await sleep(this.actuatorTravelTime * 1000);
     this.actuatorOpen.digitalWrite(OFF);
-    this.actuatorPosition = 100;
+    this.next(100);
+  }
+
+  private next(position: number) {
+    this.actuatorPosition = position;
+    this.actuatorPosition$.next(this.actuatorPosition);
   }
 }

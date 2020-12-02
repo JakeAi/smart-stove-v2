@@ -6,17 +6,23 @@ import { BehaviorSubject } from 'rxjs';
 
 @Injectable()
 export class FanService {
+  public state: OnOff = OnOff.Off;
   public state$: BehaviorSubject<OnOff> = new BehaviorSubject<OnOff>(OnOff.Off);
   private fan: Gpio;
 
   constructor() {
     this.fan = new Gpio(GpioPins.FAN, { mode: Gpio.OUTPUT });
-    this.state$.next(this.fan.digitalRead());
+    this.next(this.fan.digitalRead());
   }
 
   public setFanState(state: 0 | 1) {
     this.fan.digitalWrite(state);
-    this.state$.next(state);
+    this.next(state);
+  }
+
+  private next(state: number) {
+    this.state = state;
+    this.state$.next(this.state);
   }
 
   public setFanOn() { this.setFanState(ON); }

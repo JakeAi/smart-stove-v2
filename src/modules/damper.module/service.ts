@@ -23,7 +23,9 @@ export class DamperService {
 
   public async setDamperPosition(position: number) {
     if (position === this.actuatorPosition) { return; }
-    if (position < 0 || position > 100) { throw new Error('Invalid position ' + position); }
+    if (position < 0) { position = 0; }
+    if (position > 100) { position = 100; }
+
     const distanceToGo = this.actuatorPosition - position;
     const secondsOfTravel = this.actuatorTravelTime * Math.abs(distanceToGo) / 100 * 1000;
 

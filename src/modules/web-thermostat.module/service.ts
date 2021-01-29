@@ -31,8 +31,8 @@ export class WebThermostatService {
     this.fanService.state$.subscribe();
 
     this.smallJump = parseInt(this.configService.get('smallJump', '5'), 10);
-    this.largeJump = parseInt(this.configService.get('smallJump', '5'), 10);
-    this.overTemperatureDelta = parseInt(this.configService.get('smallJump', '5'), 10);
+    this.largeJump = parseInt(this.configService.get('smallJump', '10'), 10);
+    this.overTemperatureDelta = parseInt(this.configService.get('smallJump', '50'), 10);
 
 
     timer(1, this.configService.get('decisionMakerIntervalMinutes') * 60 * 1000)

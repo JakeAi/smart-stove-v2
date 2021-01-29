@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { openSync, SpiDevice, SpiMessage } from 'spi-device';
-import { Observable, of, Subject, timer } from 'rxjs';
+import { interval, Observable, of, Subject } from 'rxjs';
 import { map, mergeMap } from 'rxjs/operators';
 import { ProcessService } from '../process.module/service';
 import { ConfigService } from '@nestjs/config';
@@ -32,13 +32,13 @@ export class TemperatureService {
 
   private max6675: SpiDevice;
   private readTemperatureMessage: SpiMessage = [{ sendBuffer: Buffer.from([0x01, 0xd0, 0x00]), receiveBuffer: Buffer.alloc(2), byteLength: 2, speedHz: 20000 }];
+  private temperatureReadingIntervalSeconds: number;
 
 
   constructor(
     private processService: ProcessService,
     private configService: ConfigService,
   ) {
-
     this.processService.tearDownCallbacks.push(() => new Promise((resolve, reject) => {
       this.max6675.close((err: Error | null | undefined) => {
         if (err) { return reject(err); }
@@ -48,7 +48,9 @@ export class TemperatureService {
 
     this.max6675 = openSync(0, 0);
 
-    timer(1, this.configService.get('temperatureReadingIntervalSeconds',15000) )
+    this.temperatureReadingIntervalSeconds = parseInt(this.configService.get('temperatureReadingIntervalSeconds', '15'), 10);
+
+    interval(this.temperatureReadingIntervalSeconds * 1000)
       .pipe(
         mergeMap(() => this.readTemperature()),
         mergeMap((temperature) => of(this._temperature$)

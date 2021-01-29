@@ -4,7 +4,7 @@ import { HeatingCoolingState, TemperatureDirection } from '../../constants';
 import { DamperService } from '../damper.module/service';
 import { FanService } from '../fan.module/service';
 import { TemperatureService } from '../temperature.module/service';
-import { BehaviorSubject, combineLatest, timer } from 'rxjs';
+import { BehaviorSubject, combineLatest, interval } from 'rxjs';
 import { filter, mergeMap } from 'rxjs/operators';
 
 
@@ -37,7 +37,7 @@ export class WebThermostatService {
     this.decisionMakerIntervalMinutes = parseInt(this.configService.get('decisionMakerIntervalMinutes', '5'), 10);
 
 
-    timer(1, this.decisionMakerIntervalMinutes * 60 * 1000)
+    interval(this.decisionMakerIntervalMinutes * 60 * 1000)
       .pipe(
         mergeMap(() => combineLatest([this.targetHeatingCoolingState$, this.temperatureService.temperature$])),
         filter(([state, temp]) => state === HeatingCoolingState.Heat),

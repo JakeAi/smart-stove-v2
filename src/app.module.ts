@@ -27,6 +27,6 @@ export class AppModule {
   constructor(
     private configService: ConfigService,
   ) {
-    console.log(this.configService.get(''));
+    console.log(this.configService.get('decisionMakerIntervalMinutes'));
   }
 }

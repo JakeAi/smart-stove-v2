@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { HeatingCoolingState, TemperatureDirection } from '../../constants';
 import { DamperService } from '../damper.module/service';
@@ -17,6 +17,7 @@ export class WebThermostatService {
 
   targetHeatingCoolingState$: BehaviorSubject<HeatingCoolingState> = new BehaviorSubject<HeatingCoolingState>(HeatingCoolingState.Off);
 
+  private readonly logger = new Logger(WebThermostatService.name);
 
   constructor(
     private configService: ConfigService,
@@ -34,8 +35,12 @@ export class WebThermostatService {
       )
       .subscribe(async ([state, temp]) => {
 
+
         let { temperatureCurrent, direction, directionWeight } = temp;
         let { actuatorPosition } = this.damperService;
+
+        this.logger.log({ temp, actuatorPosition });
+
 
         if (temperatureCurrent < 50) { return await this.damperService.setDamperPosition(0); }
 

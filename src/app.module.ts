@@ -27,6 +27,12 @@ export class AppModule {
   constructor(
     private configService: ConfigService,
   ) {
-    console.log(this.configService.get('decisionMakerIntervalMinutes'));
+    console.log({
+      environment: this.configService.get('environment'),
+      development: this.configService.get('development'),
+      production: this.configService.get('production'),
+      decisionMakerIntervalMinutes: this.configService.get('decisionMakerIntervalMinutes'),
+      actuatorTravelTimeSeconds: this.configService.get('actuatorTravelTimeSeconds'),
+    });
   }
 }

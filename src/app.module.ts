@@ -10,7 +10,7 @@ import { DamperModule } from './modules/damper.module';
 @Module({
   imports: [
     ConfigModule.forRoot({
-      envFilePath: resolve(__dirname, './.env'),
+      envFilePath: resolve(__dirname, '../.env'),
       isGlobal: true,
     }),
     DamperModule,

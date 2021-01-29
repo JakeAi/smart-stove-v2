@@ -47,14 +47,6 @@ export class WebThermostatService {
         let { temperatureCurrent, direction, directionWeight } = temp;
         let { actuatorPosition } = this.damperService;
 
-        this.logger.log({
-          temp, actuatorPosition,
-          smallJump: this.smallJump,
-          largeJump: this.largeJump,
-          overTemperatureDelta: this.overTemperatureDelta,
-          decisionMakerIntervalMinutes: this.decisionMakerIntervalMinutes,
-        });
-
 
         if (temperatureCurrent < 100) { return await this.damperService.setDamperPosition(0); }
 

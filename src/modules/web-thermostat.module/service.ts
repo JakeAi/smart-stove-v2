@@ -21,6 +21,7 @@ export class WebThermostatService {
   private smallJump: number;
   private largeJump: number;
   private overTemperatureDelta: number;
+  private decisionMakerIntervalMinutes: number;
 
   constructor(
     private configService: ConfigService,
@@ -33,9 +34,10 @@ export class WebThermostatService {
     this.smallJump = parseInt(this.configService.get('smallJump', '5'), 10);
     this.largeJump = parseInt(this.configService.get('largeJump', '10'), 10);
     this.overTemperatureDelta = parseInt(this.configService.get('overTemperatureDelta', '50'), 10);
+    this.decisionMakerIntervalMinutes = parseInt(this.configService.get('decisionMakerIntervalMinutes', '5'), 10);
 
 
-    timer(1, this.configService.get('decisionMakerIntervalMinutes') * 60 * 1000)
+    timer(1, this.decisionMakerIntervalMinutes * 60 * 1000)
       .pipe(
         mergeMap(() => combineLatest([this.targetHeatingCoolingState$, this.temperatureService.temperature$])),
         filter(([state, temp]) => state === HeatingCoolingState.Heat),
@@ -46,7 +48,13 @@ export class WebThermostatService {
         let { temperatureCurrent, direction, directionWeight } = temp;
         let { actuatorPosition } = this.damperService;
 
-        this.logger.log({ temp, actuatorPosition, smallJump: this.smallJump, largeJump: this.largeJump, overTemperatureDelta: this.overTemperatureDelta });
+        this.logger.log({
+          temp, actuatorPosition,
+          smallJump: this.smallJump,
+          largeJump: this.largeJump,
+          overTemperatureDelta: this.overTemperatureDelta,
+          decisionMakerIntervalMinutes: this.decisionMakerIntervalMinutes,
+        });
 
 
         if (temperatureCurrent < 100) { return await this.damperService.setDamperPosition(0); }

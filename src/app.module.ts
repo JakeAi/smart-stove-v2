@@ -28,6 +28,7 @@ export class AppModule {
     private configService: ConfigService,
   ) {
     console.log({
+      decisionMethod: this.configService.get('decisionMethod'),
       environment: this.configService.get('environment'),
       development: this.configService.get('development'),
       production: this.configService.get('production'),

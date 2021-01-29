@@ -18,6 +18,9 @@ export class WebThermostatService {
   targetHeatingCoolingState$: BehaviorSubject<HeatingCoolingState> = new BehaviorSubject<HeatingCoolingState>(HeatingCoolingState.Off);
 
   private readonly logger = new Logger(WebThermostatService.name);
+  private smallJump: number;
+  private largeJump: number;
+  private overTemperatureDelta: number;
 
   constructor(
     private configService: ConfigService,
@@ -26,6 +29,10 @@ export class WebThermostatService {
     private temperatureService: TemperatureService,
   ) {
     this.fanService.state$.subscribe();
+
+    this.smallJump = parseInt(this.configService.get('smallJump', '5'), 10);
+    this.largeJump = parseInt(this.configService.get('smallJump', '5'), 10);
+    this.overTemperatureDelta = parseInt(this.configService.get('smallJump', '5'), 10);
 
 
     timer(1, this.configService.get('decisionMakerIntervalMinutes') * 60 * 1000)
@@ -39,21 +46,22 @@ export class WebThermostatService {
         let { temperatureCurrent, direction, directionWeight } = temp;
         let { actuatorPosition } = this.damperService;
 
-        this.logger.log({ temp, actuatorPosition });
+        this.logger.log({ temp, actuatorPosition, smallJump: this.smallJump, largeJump: this.largeJump, overTemperatureDelta: this.overTemperatureDelta });
 
 
-        if (temperatureCurrent < 50) { return await this.damperService.setDamperPosition(0); }
+        if (temperatureCurrent < 100) { return await this.damperService.setDamperPosition(0); }
 
         if (temperatureCurrent < this.targetTemperature) {
-          if (direction === TemperatureDirection.DOWN) { await this.damperService.setDamperPosition(actuatorPosition + 10); }
-          if (direction === TemperatureDirection.UP) { await this.damperService.setDamperPosition(actuatorPosition + 5); }
+          if (direction === TemperatureDirection.DOWN) { await this.damperService.setDamperPosition(actuatorPosition + this.largeJump); }
+          if (direction === TemperatureDirection.UP) { await this.damperService.setDamperPosition(actuatorPosition + this.smallJump); }
         }
 
-        if (temperatureCurrent > this.targetTemperature && temperatureCurrent < this.targetTemperature + 50) {
-          if (direction === TemperatureDirection.DOWN) { return await this.damperService.setDamperPosition(actuatorPosition + 5); }
+
+        if (temperatureCurrent > this.targetTemperature && temperatureCurrent < this.targetTemperature + this.overTemperatureDelta) {
+          if (direction === TemperatureDirection.DOWN) { return await this.damperService.setDamperPosition(actuatorPosition + this.smallJump); }
         }
-        if (temperatureCurrent > this.targetTemperature + 50) {
-          if (direction === TemperatureDirection.UP) { return await this.damperService.setDamperPosition(actuatorPosition - 5); }
+        if (temperatureCurrent > this.targetTemperature + this.overTemperatureDelta) {
+          if (direction === TemperatureDirection.UP) { return await this.damperService.setDamperPosition(actuatorPosition - this.smallJump); }
         }
 
 

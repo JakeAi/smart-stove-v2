@@ -4,8 +4,8 @@ import { HeatingCoolingState, TemperatureDirection } from '../../constants';
 import { DamperService } from '../damper.module/service';
 import { FanService } from '../fan.module/service';
 import { TemperatureService } from '../temperature.module/service';
-import { BehaviorSubject } from 'rxjs';
-import { delay, filter, repeat, withLatestFrom } from 'rxjs/operators';
+import { BehaviorSubject, timer } from 'rxjs';
+import { filter, withLatestFrom } from 'rxjs/operators';
 
 
 @Injectable()
@@ -36,13 +36,12 @@ export class WebThermostatService {
     this.overTemperatureDelta = parseInt(this.configService.get('overTemperatureDelta', '50'), 10);
     this.decisionMakerIntervalMinutes = parseInt(this.configService.get('decisionMakerIntervalMinutes', '5'), 10);
 
-    this.targetHeatingCoolingState$.pipe(
-      filter((state) => state === HeatingCoolingState.Heat),
-      withLatestFrom(this.temperatureService.temperature$),
-      delay(this.decisionMakerIntervalMinutes * 60 * 1000),
-      repeat(),
-    )
-      .subscribe(async ([state, temp]) => {
+    timer(1, this.decisionMakerIntervalMinutes * 60 * 1000)
+      .pipe(
+        withLatestFrom(this.targetHeatingCoolingState$, this.temperatureService.temperature$),
+        filter(([iterator, state, temp]) => state === HeatingCoolingState.Heat),
+      )
+      .subscribe(async ([iterator, state, temp]) => {
 
 
         let { temperatureCurrent, direction, directionWeight } = temp;

@@ -1,7 +1,7 @@
 import { Module } from '@nestjs/common';
 import { TemperatureModule } from './modules/temperature.module';
 import { ProcessModule } from './modules/process.module';
-import { ConfigModule } from '@nestjs/config';
+import { ConfigModule, ConfigService } from '@nestjs/config';
 import { resolve } from 'path';
 import { WebThermostatModule } from './modules/web-thermostat.module';
 import { FanModule } from './modules/fan.module';
@@ -24,5 +24,9 @@ import { DamperModule } from './modules/damper.module';
   exports: [],
 })
 export class AppModule {
-  constructor() {}
+  constructor(
+    private configService: ConfigService,
+  ) {
+    console.log(this.configService.get(''));
+  }
 }

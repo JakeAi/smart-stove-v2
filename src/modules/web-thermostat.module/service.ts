@@ -36,7 +36,7 @@ export class WebThermostatService {
     this.overTemperatureDelta = parseInt(this.configService.get('overTemperatureDelta', '50'), 10);
     this.decisionMakerIntervalMinutes = parseInt(this.configService.get('decisionMakerIntervalMinutes', '5'), 10);
 
-    timer(1, this.decisionMakerIntervalMinutes * 60 * 1000)
+    timer(30 * 1000, this.decisionMakerIntervalMinutes * 60 * 1000)
       .pipe(
         withLatestFrom(this.targetHeatingCoolingState$, this.temperatureService.temperature$),
         filter(([iterator, state, temp]) => state === HeatingCoolingState.Heat),

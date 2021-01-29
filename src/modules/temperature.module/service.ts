@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { openSync, SpiDevice, SpiMessage } from 'spi-device';
-import { Observable, of, Subject } from 'rxjs';
-import { delay, map, mergeMap, repeat } from 'rxjs/operators';
+import { Observable, of, Subject, timer } from 'rxjs';
+import { map, mergeMap } from 'rxjs/operators';
 import { ProcessService } from '../process.module/service';
 import { ConfigService } from '@nestjs/config';
 import { TemperatureDirection } from '../../constants';
@@ -50,15 +50,13 @@ export class TemperatureService {
 
     this.temperatureReadingIntervalSeconds = parseInt(this.configService.get('temperatureReadingIntervalSeconds', '15'), 10);
 
-    of(null)
+    timer(1, this.temperatureReadingIntervalSeconds * 1000)
       .pipe(
         mergeMap(() => this.readTemperature()),
         mergeMap((temperature) => of(this._temperature$)
           .pipe(
             map((temperature$) => ({ temperature, temperature$ })),
           )),
-        delay(this.temperatureReadingIntervalSeconds * 1000),
-        repeat(),
       )
       .subscribe(({ temperature, temperature$ }) => {
         temperature$.temperatureAveragePrevious = temperature$.temperatureAverageCurrent;

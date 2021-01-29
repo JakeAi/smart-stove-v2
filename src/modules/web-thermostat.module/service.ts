@@ -27,7 +27,7 @@ export class WebThermostatService {
     this.fanService.state$.subscribe();
 
 
-    timer(1, 60 * 1000)
+    timer(1, this.configService.get('decisionMakerIntervalMinutes') * 60 * 1000)
       .pipe(
         mergeMap(() => combineLatest([this.targetHeatingCoolingState$, this.temperatureService.temperature$])),
         filter(([state, temp]) => state === HeatingCoolingState.Heat),

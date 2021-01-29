@@ -15,7 +15,7 @@ export class DamperService {
   private actuatorTravelTime: number;
 
   constructor(private readonly config: ConfigService) {
-    this.actuatorTravelTime = config.get('actuatorTravelTime', 7);
+    this.actuatorTravelTime = config.get('actuatorTravelTimeSeconds', 7);
     this.actuatorOpen = new Gpio(GpioPins.ACTUATOR_OPEN, { mode: Gpio.OUTPUT });
     this.actuatorClose = new Gpio(GpioPins.ACTUATOR_CLOSE, { mode: Gpio.OUTPUT });
     this.setDamperPosition(100);

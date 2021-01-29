@@ -48,7 +48,7 @@ export class TemperatureService {
 
     this.max6675 = openSync(0, 0);
 
-    timer(1, 15000)
+    timer(1, this.configService.get('temperatureReadingIntervalSeconds',15000) )
       .pipe(
         mergeMap(() => this.readTemperature()),
         mergeMap((temperature) => of(this._temperature$)

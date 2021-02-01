@@ -48,17 +48,21 @@ export class WebThermostatService {
         let { actuatorPosition } = this.damperService;
 
 
-        if (temperatureCurrent < 100) { return await this.damperService.setDamperPosition(0); }
+        if (temperatureCurrent < 80) { return await this.damperService.setDamperPosition(0); }
 
         if (temperatureCurrent < this.targetTemperature) {
           if (direction === TemperatureDirection.DOWN) { await this.damperService.setDamperPosition(actuatorPosition + this.largeJump); }
-          if (direction === TemperatureDirection.UP) { await this.damperService.setDamperPosition(actuatorPosition + this.smallJump); }
         }
 
 
-        if (temperatureCurrent > this.targetTemperature && temperatureCurrent < this.targetTemperature + this.overTemperatureDelta) {
+        if (
+          temperatureCurrent > this.targetTemperature &&
+          temperatureCurrent < this.targetTemperature + this.overTemperatureDelta
+        ) {
           if (direction === TemperatureDirection.DOWN) { return await this.damperService.setDamperPosition(actuatorPosition + this.smallJump); }
         }
+
+
         if (temperatureCurrent > this.targetTemperature + this.overTemperatureDelta) {
           if (direction === TemperatureDirection.UP) { return await this.damperService.setDamperPosition(actuatorPosition - this.smallJump); }
         }

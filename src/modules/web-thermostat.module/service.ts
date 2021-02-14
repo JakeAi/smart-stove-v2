@@ -51,7 +51,7 @@ export class WebThermostatService {
         if (temperatureCurrent < 80) { return await this.damperService.setDamperPosition(0); }
 
         if (temperatureCurrent < this.targetTemperature) {
-          if (direction === TemperatureDirection.DOWN) { await this.damperService.setDamperPosition(actuatorPosition + this.largeJump); }
+          if (direction === TemperatureDirection.DOWN) {return  await this.damperService.setDamperPosition(actuatorPosition + this.largeJump); }
         }
 
 
